@@ -15,8 +15,8 @@ app.post('/run-sequential-apis', async (req, res) => {
     try {
         // Step 1: Authenticate and get session ID
         const authResponse = await axios.post('https://esm.emtel.com/cgrestapi/api/authenticate/user', {
-            username: 'Emtelorg\\vikask',
-            password: 'Feb@12345'
+            username: ' ',
+            password: ' '
         });
 
         const sessionId = authResponse.data.sessionId;
