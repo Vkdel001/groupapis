@@ -1,0 +1,67 @@
+const express = require('express');
+const axios = require('axios');
+const bodyParser = require('body-parser');
+
+const app = express();
+const port = 3000;
+
+
+
+app.use(bodyParser.json());
+
+app.get('/', (req, res) => {
+    res.send('Hello CG');
+});
+
+const runSequentialAPIs = async () => {
+    try {
+        // Step 1:  Authenticate and get session ID
+        const authResponse = await axios.post('https://esm.emtel.com/cgrestapi/api/authenticate/user', {
+            username: 'Emtelorg\\vikask',
+            password: 'Feb@12345'
+        });
+
+        const sessionId = authResponse.data.sessionId;
+        console.log('Session ID:', sessionId);
+
+        // API 2: Creating a new Incident ticket using session id from step 1
+        const incidentResponse = await axios.post('https://esm.emtel.com/cgrestapi/api/incidentrequest', {
+            Summary: 'Testing the REST API', // to be picked from clappia field
+            Urgency: 1,
+            Priority: 2,
+            Impact: 1,
+            HistoryRecords: [
+                {
+                    Action: 'Description', // to be picked from clappia field 
+                    Comment: 'This description was added via the REST API.' // to be picked from clappia field
+                }
+            ]
+        }, {
+            headers: {
+                sessionid: sessionId,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Incident Response:', incidentResponse.data.ID);         
+        const itemIDPIT = incidentResponse.data.ID;  // This is the internal id for incident created
+
+         // Step 3 : Fetching the incident number IR from internal id created in step 2
+        const itemResponse = await axios.get(`https://esm.emtel.com/cgrestapi/api/entity/incidentrequest/${itemIDPIT}?columns=EmailPIT&columns=DueDate`, {
+            headers: {
+                sessionid: sessionId
+            }
+        });
+
+        console.log('Item Response:', itemResponse.data[0].ItemIDPIT); // This is the value of IR-00xxxxx 
+
+    } catch (error) {
+        console.error('Error:', error.response ? error.response.data : error.message);
+    }
+};
+
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+    // Runs the sequential API calls when the server starts
+    runSequentialAPIs();
+});

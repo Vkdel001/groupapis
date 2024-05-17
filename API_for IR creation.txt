@@ -1,0 +1,34 @@
+API 1 : To get session id
+
+curl --location 'https://esm.emtel.com/cgrestapi/api/authenticate/user' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "username": "Emtelorg\\vikask",
+  "password": "Feb@12345"
+}'
+
+
+API 2 : To create a new request; Session id is from API1
+
+curl --location 'https://esm.emtel.com/cgrestapi/api/incidentrequest' \
+--header 'sessionid: 5Hc4H/4sM769uZrA7hbUWMoENb0mF1KNRf8wJqOoFnqDgTLs2BEC2ZbjeVOBCq4g' \
+--header 'Content-Type: application/json' \
+--data '{
+  "Summary": "Testing the REST API",
+  "Urgency": 1,
+  "Priority": 2,
+  "Impact": 1,
+  "HistoryRecords": [
+    {
+      "Action": "Description",
+      "Comment": "This description was added via the REST API."
+    }
+  ]
+}
+'
+
+API3 : To get the ItemIDPIT from the response; session id is from API 1
+
+curl --location 'https://esm.emtel.com/cgrestapi/api/entity/incidentrequest/36387?columns=EmailPIT&columns=DueDate' \
+--header 'sessionid: WNLfIZFCs2Auzma9clTGif29YVLC0GequtUYbmQR1xJTw2g5U8ZqeFW43sqiDTax' \
+--data ''
